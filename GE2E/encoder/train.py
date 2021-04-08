@@ -21,7 +21,7 @@ def train(run_id: str, data_dir:str, validate_data_dir:str, models_dir: Path, um
         train_dataset,
         cls_per_batch,
         img_per_cls,
-        num_workers=1,
+        num_workers=6,
     )
 
     validate_dataset = LandmarkDataset(validate_data_dir, v_img_per_cls)
@@ -29,7 +29,7 @@ def train(run_id: str, data_dir:str, validate_data_dir:str, models_dir: Path, um
         validate_dataset,
         v_cls_per_batch,
         v_img_per_cls,
-        num_workers=1,
+        num_workers=4,
     )
 
     validate_iter = iter(validate_loader)

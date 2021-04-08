@@ -10,11 +10,11 @@ def parse_args():
         "Name for this model instance. If a model state from the same run ID was previously "
         "saved, the training will restart from there. Pass -f to overwrite saved states and "
         "restart from scratch.")
-    parser.add_argument("-d", "--data_dir", type=Path, default="/home/paddlepaddle123/russell/google-landmark/train_clean_processed", help=\
+    parser.add_argument("-d", "--data_dir", type=Path, default="/datadrive/google-landmark/train_clean_processed", help=\
         "Path to preprocessed data")
-    parser.add_argument("-vd", "--validate_data_dir", type=Path, default="/home/paddlepaddle123/russell/google-landmark/train_clean_processed", help=\
+    parser.add_argument("-vd", "--validate_data_dir", type=Path, default="/datadrive/google-landmark/train_clean_processed", help=\
         "Path to preprocessed data")
-    parser.add_argument("-m", "--models_dir", type=Path, default="/home/paddlepaddle123/russell/landmark-retrieval/GE2E", help=\
+    parser.add_argument("-m", "--models_dir", type=Path, default="/datadrive/google-landmark/landmark-retrieval/GE2E/train_ckpts", help=\
         "Path to the output directory that will contain the saved model weights, as well as "
         "backups of those weights and plots generated during training.")
     parser.add_argument("-v", "--vis_every", type=int, default=200, help= \
