@@ -31,9 +31,9 @@ class Visualizations:
         self.update_every = update_every
         self.step_times = []
         self.losses = []
-        self.eers = []
+        self.accs = []
         self.validate_losses = []
-        self.validate_eers = []
+        self.validate_accs = []
         print("Updating the visualizations every %d steps." % update_every)
         
         # If visdom is disabled TODO: use a better paradigm for that
@@ -58,7 +58,7 @@ class Visualizations:
         
         # Create the windows
         self.loss_win = None
-        self.eer_win = None
+        self.acc_win = None
         # self.lr_win = None
         self.implementation_win = None
         self.projection_win = None
@@ -98,7 +98,7 @@ class Visualizations:
             opts={"title": "Training implementation"}
         )
 
-    def plot_loss_eer(self, losses, eers, step, name):
+    def plot_loss_acc(self, losses, accs, step, name):
         self.loss_win = self.vis.line(
                 [np.mean(losses)],
                 [step],
@@ -113,27 +113,27 @@ class Visualizations:
                 )
             )
 
-        self.eer_win = self.vis.line(
-            [np.mean(eers)],
+        self.acc_win = self.vis.line(
+            [np.mean(accs)],
             [step],
-            win=self.eer_win,
-            update="append" if self.eer_win else None,
+            win=self.acc_win,
+            update="append" if self.acc_win else None,
             name=name,
             opts=dict(
                 legend=["Train", "Validation"],
                 xlabel="Step",
-                ylabel="EER",
+                ylabel="Accuracy",
                 title="Equal error rate"
             )
         )
 
-    def update(self, loss, eer, step):
+    def update(self, loss, acc, step):
         # Update the tracking data
         now = timer()
         self.step_times.append(1000 * (now - self.last_update_timestamp))
         self.last_update_timestamp = now
         self.losses.append(loss)
-        self.eers.append(eer)
+        self.accs.append(acc)
         print("", end="")
         
         # Update the plots every <update_every> steps
@@ -141,11 +141,11 @@ class Visualizations:
             return
         time_string = "Step time:  mean: %5dms  std: %5dms" % \
                       (int(np.mean(self.step_times)), int(np.std(self.step_times)))
-        print("\nStep %6d   Train Loss: %.4f   EER: %.4f   %s" %
-              (step, np.mean(self.losses), np.mean(self.eers), time_string))
+        print("\nStep %6d   Train Loss: %.4f   Acc: %.4f   %s" %
+              (step, np.mean(self.losses), np.mean(self.accs), time_string))
 
         if not self.disabled:
-            self.plot_loss_eer(self.losses, self.eers, step, "Train")
+            self.plot_loss_acc(self.losses, self.accs, step, "Train")
 
             # track step time
             if self.implementation_win is not None:
@@ -157,26 +157,26 @@ class Visualizations:
 
         # Reset the tracking
         self.losses.clear()
-        self.eers.clear()
+        self.accs.clear()
         self.step_times.clear()
 
-    def update_validate(self, loss, eer, step, num_validate):
+    def update_validate(self, loss, acc, step, num_validate):
         self.validate_losses.append(loss)
-        self.validate_eers.append(eer)
+        self.validate_accs.append(acc)
         print("", end="")
 
         if len(self.validate_losses) < num_validate:
             return
 
-        print("\nStep %6d   Validation Loss: %.4f   EER: %.4f" %
-              (step, np.mean(self.validate_losses), np.mean(self.validate_eers)))
+        print("\nStep %6d   Validation Loss: %.4f   Acc: %.4f" %
+              (step, np.mean(self.validate_losses), np.mean(self.validate_accs)))
 
         if not self.disabled:
-            self.plot_loss_eer(self.validate_losses, self.validate_eers, step, "Validation")
+            self.plot_loss_acc(self.validate_losses, self.validate_accs, step, "Validation")
 
         # Reset the tracking
         self.validate_losses.clear()
-        self.validate_eers.clear()
+        self.validate_accs.clear()
 
     def draw_projections(self, embeds, img_per_cls, step, out_fpath=None,
                          max_classes=20, is_validate=False):

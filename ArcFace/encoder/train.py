@@ -5,6 +5,7 @@ from encoder.model import Encoder
 from encoder.arcface import ArcFace
 from utils.profiler import Profiler
 from pathlib import Path
+import numpy as np
 import torch
 
 def sync(device: torch.device):
@@ -28,7 +29,7 @@ def train(run_id: str, data_dir:str, validate_data_dir:str, models_dir: Path, um
         train_dataset,
         cls_per_batch,
         img_per_cls,
-        num_workers=6,
+        num_workers=1,
     )
 
     validate_dataset = LandmarkDataset(validate_data_dir, v_img_per_cls)
@@ -36,7 +37,7 @@ def train(run_id: str, data_dir:str, validate_data_dir:str, models_dir: Path, um
         validate_dataset,
         v_cls_per_batch,
         v_img_per_cls,
-        num_workers=4,
+        num_workers=1,
     )
 
     validate_iter = iter(validate_loader)
@@ -54,7 +55,7 @@ def train(run_id: str, data_dir:str, validate_data_dir:str, models_dir: Path, um
 
     # Create the model and the optimizer
     model = Encoder(device, loss_device)
-    arc_face = ArcFace(2048, 81313, s=30, m=0.35)
+    arc_face = ArcFace(2048, 81313, s=30, m=0.35, device=device)
 
     multi_gpu = False
     # device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -73,7 +74,6 @@ def train(run_id: str, data_dir:str, validate_data_dir:str, models_dir: Path, um
     
     # Configure file path for the model
     state_fpath = models_dir.joinpath(run_id + ".pt")
-    # pretrained_path = models_dir / (run_id + '_backups') / 'ckpt' / 'transformer_data10000_validate_10800.pt'
     pretrained_path = state_fpath
 
     backup_dir = models_dir.joinpath(run_id + "_backups")
@@ -107,7 +107,7 @@ def train(run_id: str, data_dir:str, validate_data_dir:str, models_dir: Path, um
         
         # Forward pass
         inputs = torch.from_numpy(cls_batch.data).float().to(device)
-        labels = torch.from_numpy(cls_batch.labels).float().to(device)
+        labels = torch.from_numpy(cls_batch.labels).long().to(device)
         sync(device)
         profiler.tick("Data to %s" % device)
 
@@ -177,7 +177,7 @@ def train(run_id: str, data_dir:str, validate_data_dir:str, models_dir: Path, um
                 with torch.no_grad():
                     validate_cls_batch = next(validate_iter)
                     validate_inputs = torch.from_numpy(validate_cls_batch.data).float().to(device)
-                    validat_labels = torch.from_numpy(validate_cls_batch.labels).float().to(device)
+                    validat_labels = torch.from_numpy(validate_cls_batch.labels).long().to(device)
                     validate_embeds = model(validate_inputs)
                     validate_output = arc_face(validate_embeds, validat_labels)
                     validate_loss = criterion(validate_output, validat_labels)
