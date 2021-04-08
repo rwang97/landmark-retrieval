@@ -7,123 +7,16 @@ import collections
 from torch import nn
 import numpy as np
 import torch
-
-class SELayer(nn.Module):
-    # https://github.com/moskomule/senet.pytorch/blob/23839e07525f9f5d39982140fccc8b925fe4dee9/senet/se_module.py
-    def __init__(self, channel, reduction=16):
-        super(SELayer, self).__init__()
-        self.channel = channel
-        self.avg_pool = nn.AdaptiveAvgPool2d(1)
-        self.fc = nn.Sequential(
-            nn.Linear(channel, channel // reduction),
-            nn.ReLU(inplace=True),
-            nn.Linear(channel // reduction, channel),
-            nn.Sigmoid()
-        )
-
-    def forward(self, x):
-        b, c, _, _ = x.size()
-        y = self.avg_pool(x).view(b, c)
-        y = self.fc(y).view(b, c, 1, 1)
-        return x * y.expand_as(x)
-
-class CenteredBatchNorm2d(torch.nn.BatchNorm2d):
-    """Only apply bias, no scale like:
-        tf.layers.batch_normalization(
-            center=True, scale=False,
-            )
-    """
-
-    def __init__(self, channels):
-        super().__init__(channels, affine = True, eps=1e-5, momentum=0.01)
-        # #self.weight = 1 by default
-        # self.weight.requires_grad = False
-
-class ConvBlock(torch.nn.Module):
-    def __init__(self, in_channels, out_channels, kernel_size, bias=False):
-        super().__init__()
-        layers = [
-            ('conv2d', torch.nn.Conv2d(
-                        in_channels,
-                        out_channels,
-                        kernel_size,
-                        stride = 1,
-                        padding = kernel_size // 2,
-                        bias = bias,
-                        )),
-            ('norm2d', CenteredBatchNorm2d(out_channels)),
-            ('ReLU', torch.nn.ReLU()),
-            ]
-        self.seq = torch.nn.Sequential(collections.OrderedDict(layers))
-
-    def forward(self, x):
-        return self.seq(x)
-
-class ResidualBlock(torch.nn.Module):
-    def __init__(self, channels):
-        super().__init__()
-
-        layers = [
-            ('conv2d_1', torch.nn.Conv2d(
-                        channels,
-                        channels,
-                        3,
-                        stride = 1,
-                        padding = 1,
-                        bias = False,
-                        )),
-            ('norm2d_1', CenteredBatchNorm2d(channels)),
-            ('ReLU', torch.nn.ReLU()),
-            ('conv2d_2', torch.nn.Conv2d(
-                        channels,
-                        channels,
-                        3,
-                        stride = 1,
-                        padding = 1,
-                        bias = False,
-                        )),
-            ('norm2d_2', CenteredBatchNorm2d(channels)),
-            ('squeeze_excite', SELayer(channels, 8)),
-            ]
-        self.seq = torch.nn.Sequential(collections.OrderedDict(layers))
-
-    def forward(self, x):
-        y = self.seq(x)
-        y += x
-        y = torch.nn.functional.relu(y, inplace = True)
-        return y
-
+import torchvision
 
 class Encoder(nn.Module):
 
     def __init__(self, device, loss_device):
         super().__init__()
         self.loss_device = loss_device
-        self.num_res_blocks = 6
-        
-        self.conv_block = ConvBlock(in_channels=3, out_channels=64, kernel_size=3)
-        self.residual_blocks = nn.Sequential(
-            *[ResidualBlock(channels=64) for i in range(self.num_res_blocks)]
-        )
+        self.resnet101 = torchvision.models.resnet101(pretrained=True)
+        self.cnn = torch.nn.Sequential(*(list(self.resnet101.children())[:-1]))
 
-        self.conv_block2 = ConvBlock(in_channels=64, out_channels=64, kernel_size=3)
-        self.conv_block3 = ConvBlock(in_channels=64, out_channels=128, kernel_size=3)
-        self.conv_block4 = ConvBlock(in_channels=128, out_channels=256, kernel_size=3)
-        self.final_feature = ConvBlock(in_channels=256, out_channels=model_embedding_size, kernel_size=3)
-
-        self.global_avgpool = nn.AvgPool2d(kernel_size=8)
-
-        self.cnn = nn.Sequential(*[
-            self.conv_block,
-            self.residual_blocks,
-            self.conv_block2,
-            self.conv_block3,
-            self.conv_block4,
-            self.final_feature,
-            self.global_avgpool,
-            torch.nn.Flatten()
-        ])
-        
         # Cosine similarity scaling (with fixed initial parameter values)
         self.similarity_weight = nn.Parameter(torch.tensor([10.])) 
         self.similarity_bias = nn.Parameter(torch.tensor([-5.]))
