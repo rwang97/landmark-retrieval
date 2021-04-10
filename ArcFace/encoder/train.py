@@ -29,7 +29,7 @@ def train(run_id: str, data_dir:str, validate_data_dir:str, models_dir: Path, um
         train_dataset,
         cls_per_batch,
         img_per_cls,
-        num_workers=1,
+        num_workers=6,
     )
 
     validate_dataset = LandmarkDataset(validate_data_dir, v_img_per_cls)
@@ -37,7 +37,7 @@ def train(run_id: str, data_dir:str, validate_data_dir:str, models_dir: Path, um
         validate_dataset,
         v_cls_per_batch,
         v_img_per_cls,
-        num_workers=1,
+        num_workers=4,
     )
 
     validate_iter = iter(validate_loader)
@@ -55,7 +55,7 @@ def train(run_id: str, data_dir:str, validate_data_dir:str, models_dir: Path, um
 
     # Create the model and the optimizer
     model = Encoder(device, loss_device)
-    arc_face = ArcFace(2048, 81313, s=30, m=0.35, device=device)
+    arc_face = ArcFace(512, 81313, s=30, m=0.35, device=device)
 
     multi_gpu = False
     # device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -129,7 +129,8 @@ def train(run_id: str, data_dir:str, validate_data_dir:str, models_dir: Path, um
         scheduler.step()
         profiler.tick("Parameter update")
 
-        acc = get_acc(output, labels)
+        # acc = get_acc(output, labels)
+        acc = 0
         # Update visualizations
         # learning_rate = optimizer.param_groups[0]["lr"]
         vis.update(loss.item(), acc, step)
@@ -181,7 +182,8 @@ def train(run_id: str, data_dir:str, validate_data_dir:str, models_dir: Path, um
                     validate_embeds = model(validate_inputs)
                     validate_output = arc_face(validate_embeds, validat_labels)
                     validate_loss = criterion(validate_output, validat_labels)
-                    acc = get_acc(validate_output, validat_labels)
+                    # validate_acc = get_acc(validate_output, validat_labels)
+                    validate_acc = 0
 
                 vis.update_validate(validate_loss.item(), validate_acc, step, num_validate)
             

@@ -82,13 +82,14 @@ def embed_img(img, **kwargs):
     """
     Computes an embedding for a single image.
     """
-    embeds = embed_imgs_batch(images)
+    embeds = embed_imgs_batch(np.expand_dims(img, 0))
     
     # Compute the game embedding from the partial embeddings
-    raw_embed = np.mean(partial_embeds, axis=0)
+    raw_embed = np.mean(embeds, axis=0)
     embed = raw_embed / np.linalg.norm(raw_embed, 2)
 
     return embed
+    
 
 def embed_cls(imgs:list, **kwargs):
     raw_embed = np.mean([embed_img(img, **kwargs) for img in imgs], axis=0)

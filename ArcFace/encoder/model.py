@@ -15,8 +15,13 @@ class Encoder(nn.Module):
         super().__init__()
         self.loss_device = loss_device
         self.resnet101 = torchvision.models.resnet101(pretrained=True)
-        self.cnn = torch.nn.Sequential(*(list(self.resnet101.children())[:-1] + [torch.nn.Flatten()]))
-    
+        self.resnet101.fc = nn.Sequential(
+            nn.Dropout(0.5),
+            nn.Linear(2048, 512),
+            nn.BatchNorm1d(512)
+        )
+        self.cnn = self.resnet101
+
     def forward(self, images):
         """
         Computes the embeddings of a batch of images.
