@@ -15,7 +15,13 @@ class Encoder(nn.Module):
         super().__init__()
         self.loss_device = loss_device
         self.resnet101 = torchvision.models.resnet101(pretrained=True)
-        self.cnn = torch.nn.Sequential(*(list(self.resnet101.children())[:-1] + [torch.nn.Flatten()]))
+        self.resnet101.fc = nn.Sequential(
+            nn.Dropout(0.5),
+            nn.Linear(2048, model_embedding_size),
+            nn.BatchNorm1d(model_embedding_size)
+        )
+        self.cnn = self.resnet101
+
         # Cosine similarity scaling (with fixed initial parameter values)
         self.similarity_weight = nn.Parameter(torch.tensor([10.])) 
         self.similarity_bias = nn.Parameter(torch.tensor([-5.]))

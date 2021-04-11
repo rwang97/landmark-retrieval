@@ -17,8 +17,8 @@ class Encoder(nn.Module):
         self.resnet101 = torchvision.models.resnet101(pretrained=True)
         self.resnet101.fc = nn.Sequential(
             nn.Dropout(0.5),
-            nn.Linear(2048, 512),
-            nn.BatchNorm1d(512)
+            nn.Linear(2048, model_embedding_size),
+            nn.BatchNorm1d(model_embedding_size)
         )
         self.cnn = self.resnet101
 
