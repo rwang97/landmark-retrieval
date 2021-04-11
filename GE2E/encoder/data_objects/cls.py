@@ -61,7 +61,7 @@ class Cls:
             new_img= cv2.flip(new_img, 1)
 
         p_brightness = 0.8
-        if (random.uniform(0,1) > 1 - p_flip):
+        if (random.uniform(0,1) > 1 - p_brightness):
             new_img = self.random_brightness(new_img)
 
         # print(img.shape)

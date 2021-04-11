@@ -31,7 +31,5 @@ class Encoder(nn.Module):
         :return: the embeddings as a tensor of shape (batch_size, embedding_size)
         """
         embeds_raw = self.cnn(images)
-        embeds = embeds_raw / torch.norm(embeds_raw, dim=1, keepdim=True)
-
-        return embeds
+        return embeds_raw
     
