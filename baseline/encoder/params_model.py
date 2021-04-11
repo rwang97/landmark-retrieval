@@ -4,9 +4,9 @@ num_class = 81313
 
 ## Training parameters
 learning_rate_init = 0.01
-cls_per_batch = 2
-img_per_cls = 1
+cls_per_batch = 48
+img_per_cls = 5
 
-v_cls_per_batch = 2
-v_img_per_cls = 1
+v_cls_per_batch = 48
+v_img_per_cls = 5
 num_validate = 8

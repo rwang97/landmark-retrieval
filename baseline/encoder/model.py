@@ -18,7 +18,6 @@ class Encoder(nn.Module):
         self.cnn = torch.nn.Sequential(*(list(self.resnet101.children())[:-1]))
         self.dropout = nn.Dropout(0.5)
         self.linear = nn.Linear(2048, num_class)
-        self.cnn = self.resnet101
 
     def forward(self, images):
         """
@@ -30,6 +29,7 @@ class Encoder(nn.Module):
         """
         embeds_raw = self.cnn(images)
         output = self.dropout(embeds_raw)
+        output = torch.flatten(output, 1)
         output = self.linear(output)
 
         return embeds_raw, output
