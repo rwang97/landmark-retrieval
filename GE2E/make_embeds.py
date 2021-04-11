@@ -12,20 +12,24 @@ import csv
 import cv2
 np.set_printoptions(threshold=sys.maxsize)
 
-def process_img(img, size):
+ def process_img(self, img, size):
     height, width, channels = img.shape
     if width == height:
-        return np.transpose(cv2.resize(img, (size, size)), (2,0,1))
-
-    if width > height:
-        new_size = width
+        new_img = cv2.resize(img, (size, size))
     else:
-        new_size = height
+        ratio = float(size)/max(height, width)
+        new_height = int(height*ratio)
+        new_width = int(width*ratio)
 
-    new_x = (new_size - width) // 2
-    new_y = (new_size - height) // 2
-    new_img = cv2.copyMakeBorder(img, new_y, new_y+new_size, new_x, new_x+new_size, cv2.BORDER_CONSTANT, value=[0,0,0])
-    return np.transpose(cv2.resize(new_img, (size, size)), (2,0,1))
+        new_img = cv2.resize(img, (new_width, new_height))
+
+        delta_w = size - new_width
+        delta_h = size - new_height
+        top, bottom = delta_h//2, delta_h-(delta_h//2)
+        left, right = delta_w//2, delta_w-(delta_w//2)
+        new_img = cv2.copyMakeBorder(new_img, top, bottom, left, right, cv2.BORDER_CONSTANT, value=[0,0,0])
+
+    return np.transpose(new_img, (2, 0, 1))
 
 # multi processing version
 def multi_parse(output_dir, encoder_path, img):

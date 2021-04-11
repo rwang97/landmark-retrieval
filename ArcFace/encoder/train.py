@@ -182,8 +182,7 @@ def train(run_id: str, data_dir:str, validate_data_dir:str, models_dir: Path, um
                     validate_embeds = model(validate_inputs)
                     validate_output = arc_face(validate_embeds, validat_labels)
                     validate_loss = criterion(validate_output, validat_labels)
-                    # validate_acc = get_acc(validate_output, validat_labels)
-                    validate_acc = 0
+                    validate_acc = get_acc(validate_output, validat_labels)
 
                 vis.update_validate(validate_loss.item(), validate_acc, step, num_validate)
             
