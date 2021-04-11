@@ -12,7 +12,7 @@ import csv
 import cv2
 np.set_printoptions(threshold=sys.maxsize)
 
- def process_img(self, img, size):
+def process_img(self, img, size):
     height, width, channels = img.shape
     if width == height:
         new_img = cv2.resize(img, (size, size))
@@ -81,6 +81,7 @@ if __name__ == '__main__':
     parser.add_argument("--input_index_csv", type=Path, default='/datadrive/google-landmark/index_image_to_landmark.csv')
     parser.add_argument("--output_test_dir", type=Path, default='inference_results/embeds/test')
     parser.add_argument("--output_index_dir", type=Path, default='inference_results/embeds/index')
+    parser.add_argument("--use_large_index_set", type=bool, default=False)
 
     args = parser.parse_args()
     
@@ -101,12 +102,11 @@ if __name__ == '__main__':
 
     torch.multiprocessing.set_start_method('spawn')
 
-    count = 0
     index_list = []
     test_list = []
     with open(args.input_csv, newline='') as csvfile:
-        csv = csv.reader(csvfile)
-        for i, row in enumerate(csv):
+        csv1 = csv.reader(csvfile)
+        for i, row in enumerate(csv1):
             if i > 0 and row[2] != "Ignored":
                 img_id = row[0]
                 test_path = Path("/datadrive/google-landmark/test") / img_id[0] / img_id[1] / img_id[2] / (img_id + ".jpg")
@@ -115,10 +115,22 @@ if __name__ == '__main__':
                 index_img_ids = row[1].split()
                 index_img_paths = [Path("/datadrive/google-landmark/index") / index_img_id[0] / index_img_id[1] / index_img_id[2] / (index_img_id + ".jpg") for index_img_id in index_img_ids]
                 index_list.extend(index_img_paths)
-                
-    args.output_test_dir.mkdir(exist_ok=True, parents=True)
-    run_model(test_list, args.output_test_dir, args.enc_model_fpath)
-
+    
     index_list = set(index_list)
-    args.output_index_dir.mkdir(exist_ok=True, parents=True)
-    run_model(index_list, args.output_index_dir, args.enc_model_fpath)
+    if args.use_large_index_set:
+        with open(args.input_index_csv, newline='') as csvfile2:
+            csv2 = csv.reader(csvfile2)
+            for i, row in enumerate(csv2):
+                if i > 0 and i % 109 == 0 and len(index_list) < 10000:
+                    img_id = row[0]
+                    index_img_path = Path("/datadrive/google-landmark/index") / img_id[0] / img_id[1] / img_id[2] / (img_id + ".jpg")
+                    index_list.add(index_img_path)
+
+    # args.output_test_dir.mkdir(exist_ok=True, parents=True)
+    # run_model(test_list, args.output_test_dir, args.enc_model_fpath)
+
+    # args.output_index_dir.mkdir(exist_ok=True, parents=True)
+    # run_model(index_list, args.output_index_dir, args.enc_model_fpath)
+
+    print("number of images in test set: {}".format(len(test_list)))
+    print("number of images in index set: {}".format(len(index_list)))
