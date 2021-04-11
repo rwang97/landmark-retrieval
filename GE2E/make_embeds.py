@@ -112,25 +112,9 @@ if __name__ == '__main__':
                 index_img_paths = [Path("/datadrive/google-landmark/index") / index_img_id[0] / index_img_id[1] / index_img_id[2] / (index_img_id + ".jpg") for index_img_id in index_img_ids]
                 index_list.extend(index_img_paths)
                 
-    index_list = set(index_list)
-    print(len(index_list))
-    # handle input and output dir
-    # args.output_test_dir.mkdir(exist_ok=True, parents=True)
-    # run_model(test_list, args.output_test_dir, args.enc_model_fpath)
+    args.output_test_dir.mkdir(exist_ok=True, parents=True)
+    run_model(test_list, args.output_test_dir, args.enc_model_fpath)
 
+    index_list = set(index_list)
     args.output_index_dir.mkdir(exist_ok=True, parents=True)
     run_model(index_list, args.output_index_dir, args.enc_model_fpath)
-
-
-
-
-    # with open(args.input_index_csv, newline='') as csvfile:
-    #     csv = csv.reader(csvfile)
-    #     for i, row in enumerate(csv):
-    #         if i > 0:
-    #             img_id = row[0]
-    #             index_path = Path("/datadrive/google-landmark/index") / img_id[0] / img_id[1] / img_id[2] / (img_id + ".jpg")
-    #             index_list.append(index_path)
-
-    # args.output_index_dir.mkdir(exist_ok=True, parents=True)
-    # run_model(index_list, args.output_index_dir, args.enc_model_fpath)

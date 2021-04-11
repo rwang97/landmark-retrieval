@@ -10,6 +10,7 @@ import multiprocessing
 from functools import partial
 import csv
 import cv2
+np.set_printoptions(threshold=sys.maxsize)
 
 def process_img(img, size):
     height, width, channels = img.shape
@@ -56,7 +57,7 @@ def multi_parse(output_dir, encoder_path, img):
     np.save(saved_img_f, embedding)
 
 def run_model(img_list, output_dir, encoder_path):
-    pool = multiprocessing.Pool(3)
+    pool = multiprocessing.Pool(4)
     func = partial(multi_parse, output_dir, encoder_path)
     pool.map(func, img_list)
     pool.close()
@@ -68,11 +69,12 @@ if __name__ == '__main__':
         formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
     parser.add_argument("-e", "--enc_model_fpath", type=Path, 
-                        default="train_ckpts/ge2e_1_backups/ckpt/ge2e_1_30200.pt",
+                        default="train_ckpts/arcface_1_backups/ckpt/arcface_1_17500.pt",
                         help="Path to a saved encoder")
     parser.add_argument("--seed", type=int, default=None, help=\
         "Optional random number seed value to make toolbox deterministic.")
     parser.add_argument("--input_csv", type=Path, default='/datadrive/google-landmark/retrieval_solution_v2.1.csv')
+    parser.add_argument("--input_index_csv", type=Path, default='/datadrive/google-landmark/index_image_to_landmark.csv')
     parser.add_argument("--output_test_dir", type=Path, default='inference_results/embeds/test')
     parser.add_argument("--output_index_dir", type=Path, default='inference_results/embeds/index')
 
@@ -109,11 +111,10 @@ if __name__ == '__main__':
                 index_img_ids = row[1].split()
                 index_img_paths = [Path("/datadrive/google-landmark/index") / index_img_id[0] / index_img_id[1] / index_img_id[2] / (index_img_id + ".jpg") for index_img_id in index_img_ids]
                 index_list.extend(index_img_paths)
+                
+    args.output_test_dir.mkdir(exist_ok=True, parents=True)
+    run_model(test_list, args.output_test_dir, args.enc_model_fpath)
 
-    
-    # handle input and output dir
-    # args.output_test_dir.mkdir(exist_ok=True, parents=True)
-    # run_model(test_list, args.output_test_dir, args.enc_model_fpath)     
-
+    index_list = set(index_list)
     args.output_index_dir.mkdir(exist_ok=True, parents=True)
     run_model(index_list, args.output_index_dir, args.enc_model_fpath)
