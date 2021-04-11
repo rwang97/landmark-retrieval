@@ -1,6 +1,6 @@
 ## Model parameters
 model_embedding_size = 512
-
+num_class = 81313
 
 ## Training parameters
 learning_rate_init = 0.01

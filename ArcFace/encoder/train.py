@@ -55,7 +55,7 @@ def train(run_id: str, data_dir:str, validate_data_dir:str, models_dir: Path, um
 
     # Create the model and the optimizer
     model = Encoder(device, loss_device)
-    arc_face = ArcFace(512, 81313, s=30, m=0.35, device=device)
+    arc_face = ArcFace(model_embedding_size, num_class, s=30, m=0.35, device=device)
 
     multi_gpu = False
     # device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
