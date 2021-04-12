@@ -1,4 +1,3 @@
-from encoder import inference as encoder
 from pathlib import Path
 import numpy as np
 import argparse
@@ -39,9 +38,9 @@ if __name__ == '__main__':
     )
     parser.add_argument("--seed", type=int, default=None, help=\
         "Optional random number seed value to make toolbox deterministic.")
-    parser.add_argument("--test_embeds_path", type=Path, default='/datadrive/google-landmark/landmark-retrieval/GE2E/inference_results/embeds/test')
-    parser.add_argument("--index_embeds_path", type=Path, default='/datadrive/google-landmark/landmark-retrieval/GE2E/inference_results/embeds/index')
-    parser.add_argument("--prediction_csv", type=Path, default='/datadrive/google-landmark/landmark-retrieval/GE2E/inference_results/prediction.csv')
+    parser.add_argument("--test_embeds_path", type=Path, default='/home/ubuntu/google-landmark/landmark-retrieval/GE2E/inference_results/17500/embeds/test')
+    parser.add_argument("--index_embeds_path", type=Path, default='/home/ubuntu/google-landmark/landmark-retrieval/GE2E/inference_results/17500/embeds/index')
+    parser.add_argument("--prediction_csv", type=Path, default='/home/ubuntu/google-landmark/landmark-retrieval/GE2E/inference_results/17500/prediction.csv')
 
     args = parser.parse_args()
     
