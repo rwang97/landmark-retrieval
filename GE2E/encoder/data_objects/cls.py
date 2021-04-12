@@ -15,7 +15,15 @@ class Cls:
         images = self.image_cycler.sample(count)
         return [self.process_img(cv2.imread(str(img)), 224)/255. for img in images]
 
-    # Randomly change the brightness of imgs
+    # Randomly add gaussian noise to img
+    def random_gaussian_noise(self, img):
+        mean = 0
+        std = 5.0
+        noisy_img = img + np.random.normal(mean, std, img.shape)
+        noisy_img_clipped = np.clip(noisy_img, 0, 255)
+        return noisy_img_clipped
+
+    # Randomly change the brightness of img
     def random_brightness(self, img, max_change=60):
         hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
         h, s, v = cv2.split(hsv)
@@ -39,7 +47,6 @@ class Cls:
         return img
 
     def process_img(self, img, size):
-
         height, width, channels = img.shape
         if width == height:
             new_img = cv2.resize(img, (size, size))
@@ -65,12 +72,16 @@ class Cls:
         if (random.uniform(0,1) > 1 - p_brightness):
             new_img = self.random_brightness(new_img)
 
+        p_noise = 0.5
+        if (random.uniform(0,1) > 1 - p_noise):
+            new_img = self.random_gaussian_noise(new_img)
+
         new_img = cv2.copyMakeBorder(new_img, top, bottom, left, right, cv2.BORDER_CONSTANT, value=[0,0,0])
-        
+
         # print(img.shape)
         # print(new_img.shape)
-        # cv2.imwrite("/datadrive/google-landmark/landmark-retrieval/ArcFace/augmented/original.jpg", img)
-        # cv2.imwrite("/datadrive/google-landmark/landmark-retrieval/ArcFace/augmented/augmented.jpg", new_img)
+        # cv2.imwrite("/home/ubuntu/google-landmark/landmark-retrieval/baseline/augmented/original.jpg", img)
+        # cv2.imwrite("/home/ubuntu/google-landmark/landmark-retrieval/baseline/augmented/augmented.jpg", new_img)
         # exit(0)
 
         return np.transpose(new_img, (2, 0, 1))
