@@ -68,7 +68,7 @@ def train(run_id: str, data_dir:str, validate_data_dir:str, models_dir: Path, um
 
     optimizer = torch.optim.SGD([{'params': model.parameters()}, {'params': arc_face.parameters()}], 
                                 lr=learning_rate_init, momentum=0.9)
-    scheduler = torch.optim.lr_scheduler.StepLR(optimizer=optimizer, step_size=20000, gamma=0.5)
+    scheduler = torch.optim.lr_scheduler.StepLR(optimizer=optimizer, step_size=25000, gamma=0.5)
     
     init_step = 1
     

@@ -43,6 +43,7 @@ class Cls:
         height, width, channels = img.shape
         if width == height:
             new_img = cv2.resize(img, (size, size))
+            top, bottom, left, right = 0, 0, 0, 0
         else:
             ratio = float(size)/max(height, width)
             new_height = int(height*ratio)
@@ -54,15 +55,17 @@ class Cls:
             delta_h = size - new_height
             top, bottom = delta_h//2, delta_h-(delta_h//2)
             left, right = delta_w//2, delta_w-(delta_w//2)
-            new_img = cv2.copyMakeBorder(new_img, top, bottom, left, right, cv2.BORDER_CONSTANT, value=[0,0,0])
+            # new_img = cv2.copyMakeBorder(new_img, top, bottom, left, right, cv2.BORDER_CONSTANT, value=[0,0,0])
 
         p_flip = 0.5
         if (random.uniform(0,1) > 1 - p_flip):
             new_img= cv2.flip(new_img, 1)
 
         p_brightness = 0.8
-        if (random.uniform(0,1) > 1 - p_flip):
+        if (random.uniform(0,1) > 1 - p_brightness):
             new_img = self.random_brightness(new_img)
+
+        new_img = cv2.copyMakeBorder(new_img, top, bottom, left, right, cv2.BORDER_CONSTANT, value=[0,0,0])
 
         # print(img.shape)
         # print(new_img.shape)

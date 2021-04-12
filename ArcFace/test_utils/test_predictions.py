@@ -10,7 +10,7 @@ if __name__ == '__main__':
     )
     parser.add_argument("--seed", type=int, default=None, help=\
         "Optional random number seed value to make toolbox deterministic.")
-    parser.add_argument("--predictions", type=str, default='/datadrive/google-landmark/landmark-retrieval/ArcFace/inference_results/prediction.csv')
+    parser.add_argument("--predictions", type=str, default='/datadrive/google-landmark/landmark-retrieval/ArcFace/inference_results/16250/prediction.csv')
     parser.add_argument("--groundtruth", type=str, default='/datadrive/google-landmark/retrieval_solution_v2.1.csv')
 
     args = parser.parse_args()

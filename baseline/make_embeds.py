@@ -12,7 +12,7 @@ import csv
 import cv2
 np.set_printoptions(threshold=sys.maxsize)
 
-def process_img(self, img, size):
+def process_img(img, size):
     height, width, channels = img.shape
     if width == height:
         new_img = cv2.resize(img, (size, size))
@@ -126,11 +126,11 @@ if __name__ == '__main__':
                     index_img_path = Path("/datadrive/google-landmark/index") / img_id[0] / img_id[1] / img_id[2] / (img_id + ".jpg")
                     index_list.add(index_img_path)
 
-    # args.output_test_dir.mkdir(exist_ok=True, parents=True)
-    # run_model(test_list, args.output_test_dir, args.enc_model_fpath)
+    args.output_test_dir.mkdir(exist_ok=True, parents=True)
+    run_model(test_list, args.output_test_dir, args.enc_model_fpath)
 
-    # args.output_index_dir.mkdir(exist_ok=True, parents=True)
-    # run_model(index_list, args.output_index_dir, args.enc_model_fpath)
+    args.output_index_dir.mkdir(exist_ok=True, parents=True)
+    run_model(index_list, args.output_index_dir, args.enc_model_fpath)
 
     print("number of images in test set: {}".format(len(test_list)))
     print("number of images in index set: {}".format(len(index_list)))
