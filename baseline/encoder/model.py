@@ -16,6 +16,7 @@ class Encoder(nn.Module):
         self.loss_device = loss_device
         self.resnet101 = torchvision.models.resnet101(pretrained=True)
         self.cnn = torch.nn.Sequential(*(list(self.resnet101.children())[:-1]))
+        self.flatten = torch.nn.Flatten()
         self.dropout = nn.Dropout(0.5)
         self.linear = nn.Linear(2048, num_class)
 
@@ -32,5 +33,5 @@ class Encoder(nn.Module):
         output = torch.flatten(output, 1)
         output = self.linear(output)
 
-        return embeds_raw, output
+        return self.flatten(embeds_raw), output
     

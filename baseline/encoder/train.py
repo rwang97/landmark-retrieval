@@ -123,8 +123,7 @@ def train(run_id: str, data_dir:str, validate_data_dir:str, models_dir: Path, um
         scheduler.step()
         profiler.tick("Parameter update")
 
-        # acc = get_acc(output, labels)
-        acc = 0
+        acc = get_acc(output, labels)
         # Update visualizations
         # learning_rate = optimizer.param_groups[0]["lr"]
         vis.update(loss.item(), acc, step)
@@ -137,7 +136,8 @@ def train(run_id: str, data_dir:str, validate_data_dir:str, models_dir: Path, um
             projection_dir = backup_dir / 'projections'
             projection_dir.mkdir(exist_ok=True, parents=True)
             projection_fpath = projection_dir.joinpath("%s_umap_%d.png" % (run_id, step))
-            embeds = embeds.detach().cpu().numpy()
+            embeds = embeds.detach()
+            embeds = (embeds / torch.norm(embeds, dim=1, keepdim=True)).cpu().numpy()
             vis.draw_projections(embeds, img_per_cls, step, projection_fpath)
             vis.save()
 
@@ -183,7 +183,8 @@ def train(run_id: str, data_dir:str, validate_data_dir:str, models_dir: Path, um
             projection_dir = backup_dir / 'v_projections'
             projection_dir.mkdir(exist_ok=True, parents=True)
             projection_fpath = projection_dir.joinpath("%s_umap_%d.png" % (run_id, step))
-            validate_embeds = validate_embeds.detach().cpu().numpy()
+            validate_embeds = validate_embeds.detach()
+            validate_embeds = (validate_embeds / torch.norm(validate_embeds, dim=1, keepdim=True)).cpu().numpy()
             vis.draw_projections(validate_embeds, v_img_per_cls, step, projection_fpath, is_validate=True)
             vis.save()
 
