@@ -1,13 +1,12 @@
 from pathlib import Path
 import numpy as np
 import argparse
-import torch
 import os
 import sys
-import gzip
 import multiprocessing
 from functools import partial
 import csv
+from test_utils.metrics import metrics
 # np.set_printoptions(threshold=sys.maxsize)
 
 # multi processing version
@@ -23,7 +22,7 @@ def multi_parse(index_embeds_name, index_embeds, test_embed):
 
     
 def get_predictions(test_embeds, index_embeds_name, index_embeds):
-    pool = multiprocessing.Pool(1)
+    pool = multiprocessing.Pool(4)
     func = partial(multi_parse, index_embeds_name, index_embeds)
     data = pool.map(func, test_embeds)
     pool.close()
@@ -38,28 +37,12 @@ if __name__ == '__main__':
     )
     parser.add_argument("--seed", type=int, default=None, help=\
         "Optional random number seed value to make toolbox deterministic.")
-    parser.add_argument("--test_embeds_path", type=Path, default='/home/ubuntu/google-landmark/landmark-retrieval/GE2E/inference_results/17500/embeds/test')
-    parser.add_argument("--index_embeds_path", type=Path, default='/home/ubuntu/google-landmark/landmark-retrieval/GE2E/inference_results/17500/embeds/index')
-    parser.add_argument("--prediction_csv", type=Path, default='/home/ubuntu/google-landmark/landmark-retrieval/GE2E/inference_results/17500/prediction.csv')
-
-    args = parser.parse_args()
+    parser.add_argument("--test_embeds_path", type=Path, default='/datadrive/google-landmark/landmark-retrieval/ArcFace/inference_results/20250/embeds/test')
+    parser.add_argument("--index_embeds_path", type=Path, default='/datadrive/google-landmark/landmark-retrieval/ArcFace/inference_results/20250/embeds/index')
+    parser.add_argument("--prediction_csv", type=Path, default='/datadrive/google-landmark/landmark-retrieval/ArcFace/inference_results/20250/prediction.csv')
+    parser.add_argument("--groundtruth_csv", type=str, default='/datadrive/google-landmark/retrieval_solution_v2.1.csv')
     
-    if torch.cuda.is_available():
-        device_id = torch.cuda.current_device()
-        gpu_properties = torch.cuda.get_device_properties(device_id)
-        ## Print some environment information (for debugging purposes)
-        print("Found %d GPUs available. Using GPU %d (%s) of compute capability %d.%d with "
-            "%.1fGb total memory.\n" % 
-            (torch.cuda.device_count(),
-            device_id,
-            gpu_properties.name,
-            gpu_properties.major,
-            gpu_properties.minor,
-            gpu_properties.total_memory / 1e9))
-    else:
-        print("Using CPU for inference.\n")
-
-    torch.multiprocessing.set_start_method('spawn')
+    args = parser.parse_args()
     
     test_embeds = [(test_embed_path.stem, np.load(test_embed_path)) for test_embed_path in args.test_embeds_path.iterdir()]
 
@@ -72,7 +55,11 @@ if __name__ == '__main__':
     index_embeds = np.array(index_embeds)
     predictions = get_predictions(test_embeds, index_embeds_name, index_embeds)
 
+    # write to csv file
     with open(args.prediction_csv, 'w', newline='') as csvfile:
         writer = csv.writer(csvfile)
         for key, value in predictions.items():
             writer.writerow([key, " ".join(value)])
+
+    # calculate metrics
+    metrics(args.groundtruth_csv, args.prediction_csv)

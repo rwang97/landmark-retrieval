@@ -1,6 +1,6 @@
 import numpy as np
 import sys
-import utils
+from test_utils import utils
 
 def metrics(solution_path, predictions_path):
 
