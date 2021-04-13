@@ -14,7 +14,7 @@ def parse_args():
         "Path to preprocessed data")
     parser.add_argument("-vd", "--validate_data_dir", type=Path, default="/home/ubuntu/google-landmark/train_clean_processed_symlink", help=\
         "Path to preprocessed data")
-    parser.add_argument("-m", "--models_dir", type=Path, default="/home/ubuntu/google-landmark/landmark-retrieval/baseline/train_ckpts", help=\
+    parser.add_argument("-m", "--models_dir", type=Path, default="/home/ubuntu/google-landmark/landmark-retrieval/baseline_cls/train_ckpts", help=\
         "Path to the output directory that will contain the saved model weights, as well as "
         "backups of those weights and plots generated during training.")
     parser.add_argument("-v", "--vis_every", type=int, default=250, help= \
