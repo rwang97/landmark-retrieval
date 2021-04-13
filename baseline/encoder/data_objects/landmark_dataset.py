@@ -9,7 +9,7 @@ import os
 # TODO: improve with a pool of speakers for data efficiency
 
 class LandmarkDataset(Dataset):
-    def __init__(self, datasets_root: Path, img_per_cls: int):
+    def __init__(self, datasets_root: Path, img_per_cls: int, train: bool):
         self.root = datasets_root
         cls_dirs = [f for f in self.root.glob("*") if f.is_dir()]
 
@@ -17,7 +17,7 @@ class LandmarkDataset(Dataset):
             raise Exception("No image class found. Make sure you are pointing to the directory "
                             "containing all preprocessed image class directories.")
 
-        self.classes = [Cls(cls_dir) for cls_dir in cls_dirs]
+        self.classes = [Cls(cls_dir, train) for cls_dir in cls_dirs]
         self.cls_cycler = RandomCycler(self.classes)
 
     def __len__(self):

@@ -9,4 +9,4 @@ img_per_cls = 8
 
 v_cls_per_batch = 32
 v_img_per_cls = 8
-num_validate = 8
+num_validate = 10

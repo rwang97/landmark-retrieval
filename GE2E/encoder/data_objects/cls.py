@@ -5,7 +5,8 @@ import random
 import numpy as np
 
 class Cls:
-    def __init__(self, root: Path):
+    def __init__(self, root: Path, train: bool):
+        self.is_training = train
         self.root = root
         self.name = root.name
         self.images = [image for image in self.root.iterdir()]
@@ -16,9 +17,7 @@ class Cls:
         return [self.process_img(cv2.imread(str(img)), 224)/255. for img in images]
 
     # Randomly add gaussian noise to img
-    def random_gaussian_noise(self, img):
-        mean = 0
-        std = 5.0
+    def random_gaussian_noise(self, img, mean=0, std=5.0):
         noisy_img = img + np.random.normal(mean, std, img.shape)
         noisy_img_clipped = np.clip(noisy_img, 0, 255)
         return noisy_img_clipped
@@ -62,24 +61,33 @@ class Cls:
             delta_h = size - new_height
             top, bottom = delta_h//2, delta_h-(delta_h//2)
             left, right = delta_w//2, delta_w-(delta_w//2)
-            # new_img = cv2.copyMakeBorder(new_img, top, bottom, left, right, cv2.BORDER_CONSTANT, value=[0,0,0])
+        
+        if self.is_training:
+            p_flip = 0.5
+            if (random.uniform(0,1) > 1 - p_flip):
+                new_img= cv2.flip(new_img, 1)
 
-        p_flip = 0.5
-        if (random.uniform(0,1) > 1 - p_flip):
-            new_img= cv2.flip(new_img, 1)
+            p_brightness = 0.8
+            if (random.uniform(0,1) > 1 - p_brightness):
+                new_img = self.random_brightness(new_img)
 
-        p_brightness = 0.8
-        if (random.uniform(0,1) > 1 - p_brightness):
-            new_img = self.random_brightness(new_img)
+            p_noise = 0.5
+            if (random.uniform(0,1) > 1 - p_noise):
+                new_img = self.random_gaussian_noise(new_img)
 
-        p_noise = 0.5
-        if (random.uniform(0,1) > 1 - p_noise):
-            new_img = self.random_gaussian_noise(new_img)
+        # small variation applied to validation data
+        else:
+            p_flip = 0.5
+            if (random.uniform(0,1) > 1 - p_flip):
+                new_img= cv2.flip(new_img, 1)
+            
+            p_brightness = 0.75
+            if (random.uniform(0,1) > 1 - p_brightness):
+                new_img = self.random_brightness(new_img, max_change=40)
 
         new_img = cv2.copyMakeBorder(new_img, top, bottom, left, right, cv2.BORDER_CONSTANT, value=[0,0,0])
 
-        # print(img.shape)
-        # print(new_img.shape)
+        # print(self.is_training, img.shape, new_img.shape)
         # cv2.imwrite("/home/ubuntu/google-landmark/landmark-retrieval/baseline/augmented/original.jpg", img)
         # cv2.imwrite("/home/ubuntu/google-landmark/landmark-retrieval/baseline/augmented/augmented.jpg", new_img)
         # exit(0)

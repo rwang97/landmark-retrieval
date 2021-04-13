@@ -24,7 +24,7 @@ def train(run_id: str, data_dir:str, validate_data_dir:str, models_dir: Path, um
           save_every: int, backup_every: int, vis_every: int, validate_every:int, force_restart: bool, 
           visdom_server: str, port: str, no_visdom: bool):
     # Create a dataset and a dataloader
-    train_dataset = LandmarkDataset(data_dir, img_per_cls)
+    train_dataset = LandmarkDataset(data_dir, img_per_cls, train=True)
     train_loader = LandmarkDataLoader(
         train_dataset,
         cls_per_batch,
@@ -32,7 +32,7 @@ def train(run_id: str, data_dir:str, validate_data_dir:str, models_dir: Path, um
         num_workers=6,
     )
 
-    validate_dataset = LandmarkDataset(validate_data_dir, v_img_per_cls)
+    validate_dataset = LandmarkDataset(validate_data_dir, v_img_per_cls, train=False)
     validate_loader = LandmarkDataLoader(
         validate_dataset,
         v_cls_per_batch,
