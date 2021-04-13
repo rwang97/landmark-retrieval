@@ -74,16 +74,16 @@ if __name__ == '__main__':
         formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
     parser.add_argument("-e", "--enc_model_fpath", type=Path, 
-                        default="train_ckpts/arcface_2_backups/ckpt/arcface_2_16250.pt",
+                        default="train_ckpts/baseline_unet_1_backups/ckpt/baseline_unet_1_30000.pt",
                         help="Path to a saved encoder")
     parser.add_argument("--seed", type=int, default=None, help=\
         "Optional random number seed value to make toolbox deterministic.")
     parser.add_argument("--input_csv", type=Path, default='/home/ubuntu/google-landmark/retrieval_solution_v2.1.csv')
     parser.add_argument("--input_index_csv", type=Path, default='/home/ubuntu/google-landmark/index_image_to_landmark.csv')
-    parser.add_argument("--output_test_dir", type=Path, default='inference_results/16250/embeds/test')
-    parser.add_argument("--output_index_dir", type=Path, default='inference_results/16250/embeds/index')
-    parser.add_argument("--output_small_index_dir", type=Path, default='inference_results/16250/embeds/index_small')
-    parser.add_argument("--use_large_index_set", type=bool, default=True)
+    parser.add_argument("--output_test_dir", type=Path, default='inference_results/30000/embeds/test')
+    parser.add_argument("--output_index_dir", type=Path, default='inference_results/30000/embeds/index')
+    parser.add_argument("--output_small_index_dir", type=Path, default='inference_results/30000/embeds/index_small')
+    parser.add_argument("--use_large_index_set", type=bool, default=False)
 
     args = parser.parse_args()
     
@@ -112,11 +112,11 @@ if __name__ == '__main__':
         for i, row in enumerate(csv1):
             if i > 0 and row[2] != "Ignored":
                 img_id = row[0]
-                test_path = Path("/datadrive/google-landmark/test") / img_id[0] / img_id[1] / img_id[2] / (img_id + ".jpg")
+                test_path = Path("/home/ubuntu/google-landmark/test") / img_id[0] / img_id[1] / img_id[2] / (img_id + ".jpg")
                 test_list.append(test_path)
 
                 index_img_ids = row[1].split()
-                index_img_paths = [Path("/datadrive/google-landmark/index") / index_img_id[0] / index_img_id[1] / index_img_id[2] / (index_img_id + ".jpg") for index_img_id in index_img_ids]
+                index_img_paths = [Path("/home/ubuntu/google-landmark/index") / index_img_id[0] / index_img_id[1] / index_img_id[2] / (index_img_id + ".jpg") for index_img_id in index_img_ids]
                 index_list.extend(index_img_paths)
                 small_index_list.extend(index_img_ids)
     
@@ -128,7 +128,7 @@ if __name__ == '__main__':
             for i, row in enumerate(csv2):
                 if i > 0 and i % 90 == 0:
                     img_id = row[0]
-                    index_img_path = Path("/datadrive/google-landmark/index") / img_id[0] / img_id[1] / img_id[2] / (img_id + ".jpg")
+                    index_img_path = Path("/home/ubuntu/google-landmark/index") / img_id[0] / img_id[1] / img_id[2] / (img_id + ".jpg")
                     index_list.add(index_img_path)
 
     args.output_test_dir.mkdir(exist_ok=True, parents=True)

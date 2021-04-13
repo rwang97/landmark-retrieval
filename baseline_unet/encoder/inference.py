@@ -74,7 +74,8 @@ def embed_imgs_batch(images):
     
     images = torch.from_numpy(images).float().to(_device)
     with torch.no_grad():
-        embed = _model.forward(images).detach().cpu().numpy()
+        embed, _ = _model.forward(images)
+        embed = embed.detach().cpu().numpy()
 
     return embed
 

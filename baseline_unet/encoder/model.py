@@ -4,6 +4,7 @@ import numpy as np
 import torch
 import torchvision
 
+# https://github.com/zhoudaxia233/PyTorch-Unet/blob/master/resnet_unet.py
 def double_conv(in_channels, out_channels):
     return nn.Sequential(
         nn.Conv2d(in_channels, out_channels, kernel_size=3, stride=1, padding=1),
@@ -76,6 +77,11 @@ class Unet(nn.Module):
 
         x = self.up_conv10(x)
         x = self.conv10(x)
+        # print("\n=== block1 ===\n", self.block1)
+        # print("\n=== block2 ===\n", self.block2)
+        # print("\n=== block3 ===\n", self.block3)
+        # print("\n=== block4 ===\n", self.block4)
+        # print("\n=== block5 ===\n", self.block5)
 
         return self.flatten(self.avgpool(block5)), x
     
