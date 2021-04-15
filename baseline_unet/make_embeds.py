@@ -35,7 +35,9 @@ def process_img(img, size):
 # multi processing version
 def multi_parse(output_dir, encoder_path, img_list):
     saved_img_f_list = [output_dir / img.stem for img in img_list if not os.path.exists(str(output_dir / img.stem) + '.npy')]
-
+    if len(saved_img_f_list) == 0:
+        return
+        
     # https://stackoverflow.com/questions/50412477/python-multiprocessing-grab-free-gpu
     if torch.cuda.is_available():
         cpu_name = multiprocessing.current_process().name
@@ -46,19 +48,18 @@ def multi_parse(output_dir, encoder_path, img_list):
         device = torch.device("cpu")
 
     encoder.load_model(encoder_path, multi_gpu=False, device=device)
-    input_imgs = np.array([process_img(cv2.imread(str(img)), 224)/255. for img in img_list])
+    input_imgs = np.array([process_img(cv2.imread(str(img)), 224)/255. for img in img_list if not os.path.exists(str(output_dir / img.stem) + '.npy')])
     print(input_imgs.shape)
     embeddings = encoder.embed_imgs(input_imgs)
 
     torch.cuda.empty_cache()
-    
     [np.save(saved_img_f_list[i], embeddings[i]) for i in range(len(embeddings))]
 
 def run_model(img_list, output_dir, encoder_path):
     # make batch of img list
-    batch_size = 512
+    batch_size = 256
     img_list_chunks = [img_list[x:x+batch_size] for x in range(0, len(img_list), batch_size)]
-    pool = multiprocessing.Pool(4)
+    pool = multiprocessing.Pool(2)
     func = partial(multi_parse, output_dir, encoder_path)
     pool.map(func, img_list_chunks)
     pool.close()
@@ -79,7 +80,7 @@ if __name__ == '__main__':
     parser.add_argument("--output_test_dir", type=Path, default='inference_results/35000/embeds/test')
     parser.add_argument("--output_index_dir", type=Path, default='inference_results/35000/embeds/index')
     parser.add_argument("--output_small_index_dir", type=Path, default='inference_results/35000/embeds/index_small')
-    parser.add_argument("--use_large_index_set", type=bool, default=False)
+    parser.add_argument("--use_large_index_set", type=bool, default=True)
 
     args = parser.parse_args()
     

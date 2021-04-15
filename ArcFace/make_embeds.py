@@ -35,6 +35,8 @@ def process_img(img, size):
 # multi processing version
 def multi_parse(output_dir, encoder_path, img_list):
     saved_img_f_list = [output_dir / img.stem for img in img_list if not os.path.exists(str(output_dir / img.stem) + '.npy')]
+    if len(saved_img_f_list) == 0:
+        return
 
     # https://stackoverflow.com/questions/50412477/python-multiprocessing-grab-free-gpu
     if torch.cuda.is_available():
@@ -46,7 +48,7 @@ def multi_parse(output_dir, encoder_path, img_list):
         device = torch.device("cpu")
 
     encoder.load_model(encoder_path, multi_gpu=False, device=device)
-    input_imgs = np.array([process_img(cv2.imread(str(img)), 224)/255. for img in img_list])
+    input_imgs = np.array([process_img(cv2.imread(str(img)), 224)/255. for img in img_list if not os.path.exists(str(output_dir / img.stem) + '.npy')])
     print(input_imgs.shape)
     embeddings = encoder.embed_imgs(input_imgs)
 

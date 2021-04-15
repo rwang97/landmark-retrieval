@@ -4,3 +4,4 @@ train_ckpts
 __pycache__
 *.pt
 encoder_saved_models
+*.tar.gz
