@@ -11,13 +11,6 @@ def sync(device: torch.device):
     # For correct profiling (cuda operations are async)
     if device.type == "cuda":
         torch.cuda.synchronize(device)
-    
-def get_acc(output, label):
-    output = output.data.cpu().numpy()
-    output = np.argmax(output, axis=1)
-    label = label.data.cpu().numpy()
-    acc = np.mean((output == label).astype(int))
-    return acc
 
 def train(run_id: str, data_dir:str, validate_data_dir:str, models_dir: Path, umap_every: int, 
           save_every: int, backup_every: int, vis_every: int, validate_every:int, force_restart: bool, 
@@ -123,8 +116,8 @@ def train(run_id: str, data_dir:str, validate_data_dir:str, models_dir: Path, um
         scheduler.step()
         profiler.tick("Parameter update")
 
-        # acc = get_acc(output, labels)
-        acc = 0
+        acc = loss.item() # placeholder for accuracy
+
         # Update visualizations
         # learning_rate = optimizer.param_groups[0]["lr"]
         vis.update(loss.item(), acc, step)
@@ -176,8 +169,7 @@ def train(run_id: str, data_dir:str, validate_data_dir:str, models_dir: Path, um
                     # validat_labels = torch.from_numpy(validate_cls_batch.labels).long().to(device)
                     validate_embeds, validate_output = model(validate_inputs)
                     validate_loss = criterion(validate_output, validate_inputs)
-                    # validate_acc = get_acc(validate_output, validat_labels)
-                    validate_acc = 0
+                    validate_acc = validate_loss.item() # placeholder for accuracy
 
                 vis.update_validate(validate_loss.item(), validate_acc, step, num_validate)
             

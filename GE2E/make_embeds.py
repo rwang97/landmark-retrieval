@@ -62,7 +62,7 @@ def multi_parse(output_dir, encoder_path, img):
     np.save(saved_img_f, embedding)
 
 def run_model(img_list, output_dir, encoder_path):
-    pool = multiprocessing.Pool(8)
+    pool = multiprocessing.Pool(4)
     func = partial(multi_parse, output_dir, encoder_path)
     pool.map(func, img_list)
     pool.close()
@@ -74,16 +74,16 @@ if __name__ == '__main__':
         formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
     parser.add_argument("-e", "--enc_model_fpath", type=Path, 
-                        default="train_ckpts/ge2e_2_backups/ckpt/ge2e_2_33000.pt",
+                        default="train_ckpts/ge2e_2_backups/ckpt/ge2e_2_35000.pt",
                         help="Path to a saved encoder")
     parser.add_argument("--seed", type=int, default=None, help=\
         "Optional random number seed value to make toolbox deterministic.")
     parser.add_argument("--input_csv", type=Path, default='/home/ubuntu/google-landmark/retrieval_solution_v2.1.csv')
     parser.add_argument("--input_index_csv", type=Path, default='/home/ubuntu/google-landmark/index_image_to_landmark.csv')
-    parser.add_argument("--output_test_dir", type=Path, default='inference_results/33000/embeds/test')
-    parser.add_argument("--output_index_dir", type=Path, default='inference_results/33000/embeds/index')
-    parser.add_argument("--output_small_index_dir", type=Path, default='inference_results/33000/embeds/index_small')
-    parser.add_argument("--use_large_index_set", type=bool, default=False)
+    parser.add_argument("--output_test_dir", type=Path, default='inference_results/35000/embeds/test')
+    parser.add_argument("--output_index_dir", type=Path, default='inference_results/35000/embeds/index')
+    parser.add_argument("--output_small_index_dir", type=Path, default='inference_results/35000/embeds/index_small')
+    parser.add_argument("--use_large_index_set", type=bool, default=True)
 
     args = parser.parse_args()
     

@@ -74,15 +74,15 @@ if __name__ == '__main__':
         formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
     parser.add_argument("-e", "--enc_model_fpath", type=Path, 
-                        default="train_ckpts/baseline_unet_1_backups/ckpt/baseline_unet_1_30000.pt",
+                        default="train_ckpts/baseline_unet_2_backups/ckpt/baseline_unet_2_35000.pt",
                         help="Path to a saved encoder")
     parser.add_argument("--seed", type=int, default=None, help=\
         "Optional random number seed value to make toolbox deterministic.")
     parser.add_argument("--input_csv", type=Path, default='/home/ubuntu/google-landmark/retrieval_solution_v2.1.csv')
     parser.add_argument("--input_index_csv", type=Path, default='/home/ubuntu/google-landmark/index_image_to_landmark.csv')
-    parser.add_argument("--output_test_dir", type=Path, default='inference_results/30000/embeds/test')
-    parser.add_argument("--output_index_dir", type=Path, default='inference_results/30000/embeds/index')
-    parser.add_argument("--output_small_index_dir", type=Path, default='inference_results/30000/embeds/index_small')
+    parser.add_argument("--output_test_dir", type=Path, default='inference_results/35000/embeds/test')
+    parser.add_argument("--output_index_dir", type=Path, default='inference_results/35000/embeds/index')
+    parser.add_argument("--output_small_index_dir", type=Path, default='inference_results/35000/embeds/index_small')
     parser.add_argument("--use_large_index_set", type=bool, default=False)
 
     args = parser.parse_args()
