@@ -37,9 +37,9 @@ if __name__ == '__main__':
     )
     parser.add_argument("--seed", type=int, default=None, help=\
         "Optional random number seed value to make toolbox deterministic.")
-    parser.add_argument("--test_embeds_path", type=Path, default='/datadrive/google-landmark/landmark-retrieval/ArcFace/inference_results/20250/embeds/test')
-    parser.add_argument("--index_embeds_path", type=Path, default='/datadrive/google-landmark/landmark-retrieval/ArcFace/inference_results/20250/embeds/index')
-    parser.add_argument("--prediction_csv", type=Path, default='/datadrive/google-landmark/landmark-retrieval/ArcFace/inference_results/20250/prediction.csv')
+    parser.add_argument("--test_embeds_path", type=Path, default='/datadrive/google-landmark/landmark-retrieval/ArcFace/inference_results/35000/embeds/test')
+    parser.add_argument("--index_embeds_path", type=Path, default='/datadrive/google-landmark/landmark-retrieval/ArcFace/inference_results/35000/embeds/index')
+    parser.add_argument("--prediction_csv", type=Path, default='/datadrive/google-landmark/landmark-retrieval/ArcFace/inference_results/35000/prediction.csv')
     parser.add_argument("--groundtruth_csv", type=str, default='/datadrive/google-landmark/retrieval_solution_v2.1.csv')
     
     args = parser.parse_args()
