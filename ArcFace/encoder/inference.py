@@ -88,7 +88,15 @@ def embed_img(img, **kwargs):
     embed = raw_embed / np.linalg.norm(raw_embed, 2)
 
     return embed
+
+def embed_imgs(imgs, **kwargs):
+    """
+    Computes the embedding for a batch of images.
+    """
+    embeds = embed_imgs_batch(imgs)
+    embeds = embeds / np.linalg.norm(embeds, 2, axis=1, keepdims=True)
     
+    return embeds
 
 def embed_cls(imgs:list, **kwargs):
     raw_embed = np.mean([embed_img(img, **kwargs) for img in imgs], axis=0)

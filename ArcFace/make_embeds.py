@@ -33,13 +33,8 @@ def process_img(img, size):
     return np.transpose(new_img, (2, 0, 1))
 
 # multi processing version
-def multi_parse(output_dir, encoder_path, img):
-    saved_img_f = output_dir / img.stem
-    if os.path.exists(str(saved_img_f) + '.npy'):
-        print("img {} embedding exists".format(img.stem))
-        return
-    # Load the models one by one.
-    print("============ running encoder on {} ============".format(img.stem))
+def multi_parse(output_dir, encoder_path, img_list):
+    saved_img_f_list = [output_dir / img.stem for img in img_list if not os.path.exists(str(output_dir / img.stem) + '.npy')]
 
     # https://stackoverflow.com/questions/50412477/python-multiprocessing-grab-free-gpu
     if torch.cuda.is_available():
@@ -51,20 +46,21 @@ def multi_parse(output_dir, encoder_path, img):
         device = torch.device("cpu")
 
     encoder.load_model(encoder_path, multi_gpu=False, device=device)
-    input_img = process_img(cv2.imread(str(img)), 224)/255. 
-    embedding = encoder.embed_img(input_img)
+    input_imgs = np.array([process_img(cv2.imread(str(img)), 224)/255. for img in img_list])
+    print(input_imgs.shape)
+    embeddings = encoder.embed_imgs(input_imgs)
 
     torch.cuda.empty_cache()
     
-    if os.path.exists(str(saved_img_f) + '.npy'):
-        print("img {} embedding exists".format(img.stem))
-        return
-    np.save(saved_img_f, embedding)
+    [np.save(saved_img_f_list[i], embeddings[i]) for i in range(len(embeddings))]
 
 def run_model(img_list, output_dir, encoder_path):
+    # make batch of img list
+    batch_size = 512
+    img_list_chunks = [img_list[x:x+batch_size] for x in range(0, len(img_list), batch_size)]
     pool = multiprocessing.Pool(4)
     func = partial(multi_parse, output_dir, encoder_path)
-    pool.map(func, img_list)
+    pool.map(func, img_list_chunks)
     pool.close()
     pool.join()
 
@@ -74,15 +70,15 @@ if __name__ == '__main__':
         formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
     parser.add_argument("-e", "--enc_model_fpath", type=Path, 
-                        default="train_ckpts/arcface_3_backups/ckpt/arcface_3_33750.pt",
+                        default="train_ckpts/arcface_3_backups/ckpt/arcface_3_35000.pt",
                         help="Path to a saved encoder")
     parser.add_argument("--seed", type=int, default=None, help=\
         "Optional random number seed value to make toolbox deterministic.")
     parser.add_argument("--input_csv", type=Path, default='/datadrive/google-landmark/retrieval_solution_v2.1.csv')
     parser.add_argument("--input_index_csv", type=Path, default='/datadrive/google-landmark/index_image_to_landmark.csv')
-    parser.add_argument("--output_test_dir", type=Path, default='inference_results/33750/embeds/test')
-    parser.add_argument("--output_index_dir", type=Path, default='inference_results/33750/embeds/index')
-    parser.add_argument("--output_small_index_dir", type=Path, default='inference_results/33750/embeds/index_small')
+    parser.add_argument("--output_test_dir", type=Path, default='inference_results/35000/embeds/test')
+    parser.add_argument("--output_index_dir", type=Path, default='inference_results/35000/embeds/index')
+    parser.add_argument("--output_small_index_dir", type=Path, default='inference_results/35000/embeds/index_small')
     parser.add_argument("--use_large_index_set", type=bool, default=True)
 
     args = parser.parse_args()
@@ -135,7 +131,7 @@ if __name__ == '__main__':
     run_model(test_list, args.output_test_dir, args.enc_model_fpath)
 
     args.output_index_dir.mkdir(exist_ok=True, parents=True)
-    run_model(index_list, args.output_index_dir, args.enc_model_fpath)
+    run_model(list(index_list), args.output_index_dir, args.enc_model_fpath)
 
     if args.use_large_index_set:
         args.output_small_index_dir.mkdir(exist_ok=True, parents=True)
