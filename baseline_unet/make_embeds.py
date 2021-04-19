@@ -59,7 +59,7 @@ def run_model(img_list, output_dir, encoder_path):
     # make batch of img list
     batch_size = 256
     img_list_chunks = [img_list[x:x+batch_size] for x in range(0, len(img_list), batch_size)]
-    pool = multiprocessing.Pool(2)
+    pool = multiprocessing.Pool(4)
     func = partial(multi_parse, output_dir, encoder_path)
     pool.map(func, img_list_chunks)
     pool.close()
@@ -75,8 +75,8 @@ if __name__ == '__main__':
                         help="Path to a saved encoder")
     parser.add_argument("--seed", type=int, default=None, help=\
         "Optional random number seed value to make toolbox deterministic.")
-    parser.add_argument("--input_csv", type=Path, default='/home/ubuntu/google-landmark/retrieval_solution_v2.1.csv')
-    parser.add_argument("--input_index_csv", type=Path, default='/home/ubuntu/google-landmark/index_image_to_landmark.csv')
+    parser.add_argument("--input_csv", type=Path, default='/datadrive/google-landmark/retrieval_solution_v2.1.csv')
+    parser.add_argument("--input_index_csv", type=Path, default='/datadrive/google-landmark/index_image_to_landmark.csv')
     parser.add_argument("--output_test_dir", type=Path, default='inference_results/35000/embeds/test')
     parser.add_argument("--output_index_dir", type=Path, default='inference_results/35000/embeds/index')
     parser.add_argument("--output_small_index_dir", type=Path, default='inference_results/35000/embeds/index_small')
@@ -109,11 +109,11 @@ if __name__ == '__main__':
         for i, row in enumerate(csv1):
             if i > 0 and row[2] != "Ignored":
                 img_id = row[0]
-                test_path = Path("/home/ubuntu/google-landmark/test") / img_id[0] / img_id[1] / img_id[2] / (img_id + ".jpg")
+                test_path = Path("/datadrive/google-landmark/test") / img_id[0] / img_id[1] / img_id[2] / (img_id + ".jpg")
                 test_list.append(test_path)
 
                 index_img_ids = row[1].split()
-                index_img_paths = [Path("/home/ubuntu/google-landmark/index") / index_img_id[0] / index_img_id[1] / index_img_id[2] / (index_img_id + ".jpg") for index_img_id in index_img_ids]
+                index_img_paths = [Path("/datadrive/google-landmark/index") / index_img_id[0] / index_img_id[1] / index_img_id[2] / (index_img_id + ".jpg") for index_img_id in index_img_ids]
                 index_list.extend(index_img_paths)
                 small_index_list.extend(index_img_ids)
     
@@ -123,9 +123,9 @@ if __name__ == '__main__':
         with open(args.input_index_csv, newline='') as csvfile2:
             csv2 = csv.reader(csvfile2)
             for i, row in enumerate(csv2):
-                if i > 0 and i % 90 == 0:
+                if i > 0 and i % 2 == 0:
                     img_id = row[0]
-                    index_img_path = Path("/home/ubuntu/google-landmark/index") / img_id[0] / img_id[1] / img_id[2] / (img_id + ".jpg")
+                    index_img_path = Path("/datadrive/google-landmark/index") / img_id[0] / img_id[1] / img_id[2] / (img_id + ".jpg")
                     index_list.add(index_img_path)
 
     args.output_test_dir.mkdir(exist_ok=True, parents=True)

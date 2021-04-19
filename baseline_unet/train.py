@@ -10,11 +10,11 @@ def parse_args():
         "Name for this model instance. If a model state from the same run ID was previously "
         "saved, the training will restart from there. Pass -f to overwrite saved states and "
         "restart from scratch.")
-    parser.add_argument("-d", "--data_dir", type=Path, default="/home/ubuntu/google-landmark/train_clean_processed_symlink", help=\
+    parser.add_argument("-d", "--data_dir", type=Path, default="/datadrive/google-landmark/train_clean_processed_symlink", help=\
         "Path to preprocessed data")
-    parser.add_argument("-vd", "--validate_data_dir", type=Path, default="/home/ubuntu/google-landmark/train_clean_processed_symlink", help=\
+    parser.add_argument("-vd", "--validate_data_dir", type=Path, default="/datadrive/google-landmark/train_clean_processed_symlink", help=\
         "Path to preprocessed data")
-    parser.add_argument("-m", "--models_dir", type=Path, default="/home/ubuntu/google-landmark/landmark-retrieval/baseline_unet/train_ckpts", help=\
+    parser.add_argument("-m", "--models_dir", type=Path, default="/datadrive/google-landmark/landmark-retrieval/baseline_unet/train_ckpts", help=\
         "Path to the output directory that will contain the saved model weights, as well as "
         "backups of those weights and plots generated during training.")
     parser.add_argument("-v", "--vis_every", type=int, default=250, help= \
@@ -33,7 +33,7 @@ def parse_args():
     parser.add_argument("-f", "--force_restart", action="store_true", help= \
         "Do not load any saved model.")
     parser.add_argument("--visdom_server", type=str, default="http://localhost")
-    parser.add_argument("--port", type=str, default="8890")
+    parser.add_argument("--port", type=str, default="8870")
     parser.add_argument("--no_visdom", action="store_true", help= \
         "Disable visdom.")
     args = parser.parse_args()

@@ -21,14 +21,26 @@ def multi_parse(index_embeds_name, index_embeds, test_embed):
     return (test_embed_name, max_indices_names)
 
     
-def get_predictions(test_embeds, index_embeds_name, index_embeds):
-    pool = multiprocessing.Pool(4)
-    func = partial(multi_parse, index_embeds_name, index_embeds)
-    data = pool.map(func, test_embeds)
-    pool.close()
-    pool.join()
+# def get_predictions(test_embeds, index_embeds_name, index_embeds):
+#     pool = multiprocessing.Pool(2)
+#     func = partial(multi_parse, index_embeds_name, index_embeds)
+#     data = pool.map(func, test_embeds)
+#     pool.close()
+#     pool.join()
 
-    return dict(data)
+#     return dict(data)
+
+def get_predictions(test_embeds, index_embeds_name, index_embeds):
+    data = {}
+    for test_embed in test_embeds:
+        test_embed_name, test_embedding = test_embed
+        test_embedding = np.expand_dims(test_embedding, 0)
+        sims = np.inner(test_embedding, index_embeds)
+        max_indices = np.argsort(-sims.squeeze(0))[:100]
+        max_indices = max_indices.tolist()
+        max_indices_names = [index_embeds_name[index] for index in max_indices]
+        data[test_embed_name] = max_indices_names
+    return data
 
 if __name__ == '__main__':
     ## Info & args
@@ -37,10 +49,10 @@ if __name__ == '__main__':
     )
     parser.add_argument("--seed", type=int, default=None, help=\
         "Optional random number seed value to make toolbox deterministic.")
-    parser.add_argument("--test_embeds_path", type=Path, default='/home/ubuntu/google-landmark/landmark-retrieval/baseline_unet/inference_results/35000/embeds/test')
-    parser.add_argument("--index_embeds_path", type=Path, default='/home/ubuntu/google-landmark/landmark-retrieval/baseline_unet/inference_results/35000/embeds/index')
-    parser.add_argument("--prediction_csv", type=Path, default='/home/ubuntu/google-landmark/landmark-retrieval/baseline_unet/inference_results/35000/prediction.csv')
-    parser.add_argument("--groundtruth_csv", type=str, default='/home/ubuntu/google-landmark/retrieval_solution_v2.1.csv')
+    parser.add_argument("--test_embeds_path", type=Path, default='/datadrive/google-landmark/landmark-retrieval/baseline_unet/inference_results/35000/embeds/test')
+    parser.add_argument("--index_embeds_path", type=Path, default='/datadrive/google-landmark/landmark-retrieval/baseline_unet/inference_results/35000/embeds/index')
+    parser.add_argument("--prediction_csv", type=Path, default='/datadrive/google-landmark/landmark-retrieval/baseline_unet/inference_results/35000/prediction.csv')
+    parser.add_argument("--groundtruth_csv", type=str, default='/datadrive/google-landmark/retrieval_solution_v2.1.csv')
     
     args = parser.parse_args()
     

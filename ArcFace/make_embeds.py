@@ -124,7 +124,7 @@ if __name__ == '__main__':
         with open(args.input_index_csv, newline='') as csvfile2:
             csv2 = csv.reader(csvfile2)
             for i, row in enumerate(csv2):
-                if i > 0 and i % 90 == 0:
+                if i > 0 and i % 2 == 0:
                     img_id = row[0]
                     index_img_path = Path("/datadrive/google-landmark/index") / img_id[0] / img_id[1] / img_id[2] / (img_id + ".jpg")
                     index_list.add(index_img_path)
