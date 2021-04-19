@@ -91,5 +91,4 @@ Summary
 
 We have extended two representation learning algorithms, GE2E and ArcFace, which were originally used for speech verification and face recognition respectively, to solve the task of landmark image retrieval. The final results demonstrate the capability of cross-domain-utilization of these two algorithms, indicating that they can be transferred to the image retrieval task and obtain satisfying performance. Based on extensive experiments, we have found that ArcFace outperforms the GE2E model in image retrieval and has better potential for other representation learning tasks.
 
-Appendix A. Individual Contribution
-===================================
+
