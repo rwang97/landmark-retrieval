@@ -4,7 +4,7 @@ import numpy as np
 import torch
 import torchvision
 
-# https://github.com/zhoudaxia233/PyTorch-Unet/blob/master/resnet_unet.py
+# modified from https://github.com/zhoudaxia233/PyTorch-Unet/blob/master/resnet_unet.py
 def double_conv(in_channels, out_channels):
     return nn.Sequential(
         nn.Conv2d(in_channels, out_channels, kernel_size=3, stride=1, padding=1),
