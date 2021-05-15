@@ -9,6 +9,8 @@ To compare the two algorithms, we use the same ResNet-101 network pre-trained on
 
 Please refer to the [final report](ImageRetrieval.pdf) for more details.
 
-<img src="results/projection_ge2e.png" height="200" width="250">
-<img src="results/projection_arcface.png" height="200" width="250">
-<img src="results/projection_unet.png" height="200" width="250">
+<p float="left">
+  <img src="results/projection_ge2e.png" height="200" width="255" />
+  <img src="results/projection_arcface.png" height="200" width="255" /> 
+  <img src="results/projection_unet.png" height="200" width="255" />
+</p>
