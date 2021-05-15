@@ -1,11 +1,14 @@
 # landmark-retrieval
-This repository is for the CSC413 project, storing all the re-implementation code and data processing script.
+In this project, we extend two representation learning algorithms to perform image retrieval on Google Landmark Dataset v2. 
 
-## Abstract
-In this project, we extend two deep learning methods to perform image retrieval on Google Landmark Dataset v2. Image retrieval provides an efficient method that helps to search for related visual information within a large database. Image retrieval can be formatted as a representation learning problem where we construct an embedding space for querying similar landmark images. Our network uses ResNet-101 pre-trained on ImageNet for feature extraction and we apply two representation learning algorithms to maximize the intra-class compactness and the inter-class discrepancy of the embeddings extracted from the landmark images. We demonstrate that these two algorithms can be transferred to the image retrieval task beyond its application in the original domain, and one of the algorithms ArcFace obtains a superior retrieval performance.
+The first algorithm is inspired by [*Generalized End-to-End Loss for Speaker Verification (GE2E)*](https://arxiv.org/pdf/1710.10467.pdf), which was proposed to perform speaker verification by leveraging the centroids of the embedding vectors for different speakers to maximize intra-class compactness and inter-class discrepancy. 
 
-## Introduction
-The primary goal of image retrieval is to query a base image by analyzing the relevance of all the contents in an image database and collecting data that is similar to the base image. A large-scale benchmark, the Google Landmarks Dataset v2 (GLDv2)can be used to evaluate the performance and generalization of image retrieval techniques, and it contains more than 5 million images of human-made and natural landmarks worldwide. 
+The second algorithm, [*Additive Angular Margin Loss (ArcFace)*](https://arxiv.org/pdf/1801.07698.pdf), adds an angular margin to the angle between the features and target weights in each dimension of class, which modifies the cross entropy loss to achieve more distinguishable embeddings. 
 
-In this paper, we implement two representation learning algorithms for landmark image retrieval. The first algorithm is inspired by \emph{Generalized End-to-End Loss for Speaker Verification}, which was proposed to perform speaker verification by leveraging the centroids of the embedding vectors for different speakers to find representative clusters. The second algorithm, \emph{Additive Angular Margin Loss (ArcFace)}, adds an angular margin to the angle between the features and target weights in each dimension of class, which modifies the cross entropy loss to achieve more distinguishable embeddings. To compare the two algorithms, we use the same ResNet-101network pre-trained on ImageNet as the encoder before the representation learning stage. We also design a variant of U-Netas the baseline to learn low-dimensional embeddings during image reconstruction.
+To compare the two algorithms, we use the same ResNet-101 network pre-trained on ImageNet as the encoder before the representation learning stage. We also design a variant of U-Net as the baseline to learn low-dimensional embeddings during image reconstruction. As a result, ArcFace obtains a superior retrieval performance.
 
+Please refer to the [final report](ImageRetrieval.pdf) for more details.
+
+<img src="results/projection_ge2e.png" height="200" width="250">
+<img src="results/projection_arcface.png" height="200" width="250">
+<img src="results/projection_unet.png" height="200" width="250">
